@@ -13,3 +13,10 @@ Tech Specifications:
 5. Make the app as modular as possible using custom made libraries and functions
 
 - autoConfig library takes the data from the .env 
+
+## To Run The Project
+``` sh
+// cd to DevOps folder
+// run the command
+python run.py
+```
