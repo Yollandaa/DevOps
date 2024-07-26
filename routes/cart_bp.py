@@ -46,4 +46,14 @@ def get_user_by_name(name):
     if filtered_carts:
         return jsonify(filtered_carts), 200
     else:
-        return jsonify({"message": "User not found"}), 404
+        return jsonify({"message": "Cart not found"}), 404
+
+
+@carts_bp.route("/", methods=["POST"])
+def add_cart():
+    try:
+        cart_data = request.get_json()
+        save_cart(cart_data)
+        return jsonify({"message": "Cart added successfully"}), 201
+    except Exception as e:
+        return jsonify({"message": "An error occurred", "error": str(e)}), 500
