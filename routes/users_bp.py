@@ -19,14 +19,8 @@ def fetch_users():
     with open(USERS_FILE, "r") as file:
         local_users = json.load(file)
 
-    combined_users = local_users + [
-        user for user in api_users if user not in local_users
-    ]
-
-    with open(USERS_FILE, "w") as file:
-        json.dump(combined_users, file)
-
-    return combined_users
+    users = local_users + api_users
+    return users
 
 
 def save_users(users):
@@ -60,7 +54,15 @@ def add_user():
     try:
         user_data = request.get_json()
         users = fetch_users()
+
+        if users:
+            max_id = max(user["id"] for user in users if "id" in user)
+        else:
+            max_id = 0
+
+        user_data["id"] = max_id + 1
         users.append(user_data)
+
         save_users(users)
         return jsonify({"message": "User added successfully"}), 201
     except Exception as e:
