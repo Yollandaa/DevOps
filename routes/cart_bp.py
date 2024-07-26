@@ -37,3 +37,13 @@ def save_cart(cart):
 def get_carts():
     carts = fetch_carts()
     return jsonify(carts), 200
+
+
+@carts_bp.route("/<int:id>", methods=["GET"])
+def get_user_by_name(name):
+    carts = fetch_carts()
+    filtered_carts = [cart for cart in carts if cart["id"] == id]
+    if filtered_carts:
+        return jsonify(filtered_carts), 200
+    else:
+        return jsonify({"message": "User not found"}), 404
