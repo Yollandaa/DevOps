@@ -1,33 +1,80 @@
+import json
+import os
 from flask import Blueprint, request, jsonify
 import requests
 
 products_bp = Blueprint("products_bp", __name__)
 BASE_URL = "https://fakestoreapi.com/products"
+PRODUCTS_FILE = "products.json"
+products_data = []
+
+
+# Since we can't edit the fakestore api, let's create a local copy of the data
+def fetch_initial_data():
+    global products_data
+    response = requests.get(BASE_URL, verify=False)
+    api_products = response.json()
+    local_products = []
+
+    if not os.path.exists(PRODUCTS_FILE):
+        with open(PRODUCTS_FILE, "w") as file:
+            json.dump(local_products, file)
+    else:
+        with open(PRODUCTS_FILE, "r") as file:
+            local_products = json.load(file)
+    products_data = api_products + local_products
+
+
+fetch_initial_data()
 
 
 @products_bp.route("/", methods=["GET"])
 def get_products():
-    response = requests.get(BASE_URL, verify=False)
-    products = response.json()
-    return jsonify(products), response.status_code
+    return jsonify(products_data), 200
 
 
 @products_bp.route("/<int:product_id>", methods=["GET"])
 def get_product_by_id(product_id):
-    response = requests.get(f"{BASE_URL}/{product_id}", verify=False)
-    product = response.json()
-    return jsonify(product), response.status_code
+    product = next((prod for prod in products_data if prod["id"] == product_id), None)
+    if product:
+        return jsonify(product), 200
+    else:
+        return jsonify({"error": "Product not found"}), 404
 
 
 @products_bp.route("/categories", methods=["GET"])
 def get_categories():
-    response = requests.get(f"{BASE_URL}/categories", verify=False)
-    categories = response.json()
-    return jsonify(categories), response.status_code
+    categories = {product["category"] for product in products_data}
+    return jsonify({"categories": list(categories)}), 200
 
 
 @products_bp.route("/category/<string:category_name>", methods=["GET"])
 def get_products_in_category(category_name):
-    response = requests.get(f"{BASE_URL}/category/{category_name}", verify=False)
-    products = response.json()
-    return jsonify(products), response.status_code
+    category_products = [
+        prod for prod in products_data if prod["category"] == category_name
+    ]
+    return jsonify(category_products), 200
+
+
+@products_bp.route("/", methods=["POST"])
+def post_product():
+    new_product = request.json
+    new_product["id"] = (
+        max([prod["id"] for prod in products_data]) + 1 if products_data else 1
+    )
+    products_data.append(new_product)
+
+    # Save the new product to the JSON file
+    save_product(new_product)
+
+    return jsonify(new_product), 201
+
+
+def save_product(product):
+    with open(PRODUCTS_FILE, "r") as file:
+        local_products = json.load(file)
+
+    local_products.append(product)
+
+    with open(PRODUCTS_FILE, "w") as file:
+        json.dump(local_products, file)
