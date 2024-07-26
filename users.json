@@ -1,1 +1,1 @@
-[{"email": "john.doe@example.com", "username": "johndoe", "password": "password", "name": {"firstname": "John", "lastname": "Doe"}, "address": {"city": "Cape Town", "street": "123 Main St", "number": 123, "zipcode": "7764", "geolocation": {"lat": "40.7128", "long": "-74.0060"}}, "phone": "123-456-7890"}]
+[]
