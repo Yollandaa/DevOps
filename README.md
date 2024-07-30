@@ -17,6 +17,7 @@ Tech Specifications:
 ## To Run The Project
 ``` sh
 // cd to DevOps folder
+// cd src
 // run the command
-python run.py
+python main.py
 ```
