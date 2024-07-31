@@ -1,26 +1,13 @@
 from flask import Blueprint, request, jsonify
-import requests
+from scripts.data.data import fetch_initial_data
 import json
-import os
+
 
 user_bp = Blueprint("user_bp", __name__)
 BASE_URL = "https://fakestoreapi.com/users"
 USERS_FILE = "users.json"
 
-if not os.path.exists(USERS_FILE):
-    with open(USERS_FILE, "w") as file:
-        json.dump([], file)
-
-
-def fetch_users():
-    response = requests.get(BASE_URL, verify=False)
-    api_users = response.json()
-
-    with open(USERS_FILE, "r") as file:
-        local_users = json.load(file)
-
-    users = local_users + api_users
-    return users
+users = fetch_initial_data(BASE_URL, USERS_FILE)
 
 
 def save_users(users):
@@ -28,15 +15,24 @@ def save_users(users):
         json.dump(users, file)
 
 
+def remove_users(user):
+    with open(USERS_FILE, "r") as file:
+        local_users = json.load(file)
+
+    if user in local_users:
+        local_users.remove(user)
+        with open(USERS_FILE, "w") as file:
+            json.dump(local_users, file)
+
+
 @user_bp.route("/", methods=["GET"])
 def get_users():
-    users = fetch_users()
     return jsonify(users), 200
 
 
 @user_bp.route("/<string:name>", methods=["GET"])
 def get_user_by_name(name):
-    users = fetch_users()
+
     filtered_users = [
         user
         for user in users
@@ -53,7 +49,6 @@ def get_user_by_name(name):
 def add_user():
     try:
         user_data = request.get_json()
-        users = fetch_users()
 
         if users:
             max_id = max(user["id"] for user in users if "id" in user)
@@ -73,7 +68,7 @@ def add_user():
 def update_user(name):
     try:
         user_data = request.get_json()
-        users = fetch_users()
+        global users
         user_updated = False
         for user in users:
             if (
@@ -96,7 +91,7 @@ def update_user(name):
 @user_bp.route("/<string:name>", methods=["DELETE"])
 def delete_user(name):
     try:
-        users = fetch_users()
+        global users
         filtered_users = [
             user
             for user in users
@@ -107,7 +102,8 @@ def delete_user(name):
         if len(filtered_users) == len(users):
             return jsonify({"message": "User not found"}), 404
 
-        save_users(filtered_users)
+        users = filtered_users
+        save_users(users)
         return jsonify({"message": "User deleted successfully"}), 200
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
