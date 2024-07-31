@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from scripts.data.data import fetch_initial_data
+from scripts.data.data import *
 import json
 
 
@@ -58,7 +58,7 @@ def add_user():
         user_data["id"] = max_id + 1
         users.append(user_data)
 
-        save_users(users)
+        save_to_file(user_data, USERS_FILE)
         return jsonify({"message": "User added successfully"}), 201
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500

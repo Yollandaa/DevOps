@@ -22,3 +22,16 @@ def fetch_initial_data(url, filename):
             local_data = json.load(file)
     all_data = api_data + local_data
     return all_data
+
+
+def save_to_file(item, filename):
+    resources_dir = "./resources"
+    filepath = os.path.join(resources_dir, filename)
+
+    with open(filepath, "r") as file:
+        local_data = json.load(file)
+
+    local_data.append(item)
+
+    with open(filepath, "w") as file:
+        json.dump(local_data, file)

@@ -1,6 +1,6 @@
 import json
 from flask import Blueprint, request, jsonify
-from scripts.data.data import fetch_initial_data
+from scripts.data.data import *
 
 products_bp = Blueprint("products_bp", __name__)
 BASE_URL = "https://fakestoreapi.com/products"
@@ -52,19 +52,9 @@ def post_product():
     products_data.append(new_product)
 
     # Save the new product to the JSON file
-    save_product(new_product)
+    save_to_file(new_product, PRODUCTS_FILE)
 
     return jsonify(new_product), 201
-
-
-def save_product(product):
-    with open(PRODUCTS_FILE, "r") as file:
-        local_products = json.load(file)
-
-    local_products.append(product)
-
-    with open(PRODUCTS_FILE, "w") as file:
-        json.dump(local_products, file)
 
 
 # Delete a product using id
