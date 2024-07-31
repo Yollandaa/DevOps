@@ -8,11 +8,17 @@ def fetch_initial_data(url, filename):
     api_data = response.json()
     local_data = []
 
-    if not os.path.exists(filename):
-        with open(filename, "w") as file:
+    resources_dir = "./resources"
+    if not os.path.exists(resources_dir):
+        os.makedirs(resources_dir)
+
+    filepath = os.path.join(resources_dir, filename)
+
+    if not os.path.exists(filepath):
+        with open(filepath, "w") as file:
             json.dump(local_data, file)
     else:
-        with open(filename, "r") as file:
+        with open(filepath, "r") as file:
             local_data = json.load(file)
     all_data = api_data + local_data
     return all_data
