@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from scripts.data.data import fetch_initial_data
+from scripts.data.data import *
 import json
 
 
@@ -38,7 +38,7 @@ def add_cart():
         cart_data["id"] = max_id + 1
         carts.append(cart_data)
 
-        save_cart(carts)
+        save_to_file(cart_data, CARTS_FILE)
         return jsonify({"message": "Cart added successfully"}), 201
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
