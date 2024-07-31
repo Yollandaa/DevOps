@@ -2,13 +2,14 @@ import json
 import os
 import requests
 
+resources_dir = "./resources"
+
 
 def fetch_initial_data(url, filename):
     response = requests.get(url, verify=False)
     api_data = response.json()
     local_data = []
 
-    resources_dir = "./resources"
     if not os.path.exists(resources_dir):
         os.makedirs(resources_dir)
 
@@ -25,7 +26,6 @@ def fetch_initial_data(url, filename):
 
 
 def save_to_file(item, filename):
-    resources_dir = "./resources"
     filepath = os.path.join(resources_dir, filename)
 
     with open(filepath, "r") as file:
@@ -35,3 +35,32 @@ def save_to_file(item, filename):
 
     with open(filepath, "w") as file:
         json.dump(local_data, file)
+
+
+# -------- Product Functions ----------
+def remove_product_in_file(product, filename):
+    filepath = os.path.join(resources_dir, filename)
+    with open(filepath, "r") as file:
+        local_products = json.load(file)
+
+    if product in local_products:
+        local_products.remove(product)
+        with open(filepath, "w") as file:
+            json.dump(local_products, file)
+
+
+def update_product_in_file(updated_product, filename):
+    filepath = os.path.join(resources_dir, filename)
+    rtn = False
+    with open(filepath, "r") as file:
+        local_products = json.load(file)
+
+    for index, product in enumerate(local_products):
+        if product["id"] == updated_product["id"]:
+            local_products[index] = updated_product
+            break
+
+    with open(filepath, "w") as file:
+        json.dump(local_products, file)
+        rtn = True
+    return rtn
