@@ -1,31 +1,13 @@
 import json
-import os
 from flask import Blueprint, request, jsonify
-import requests
+from scripts.data.data import fetch_initial_data
 
 products_bp = Blueprint("products_bp", __name__)
 BASE_URL = "https://fakestoreapi.com/products"
 PRODUCTS_FILE = "products.json"
-products_data = []
-
 
 # Since we can't edit the fakestore api, let's create a local copy of the data
-def fetch_initial_data():
-    global products_data
-    response = requests.get(BASE_URL, verify=False)
-    api_products = response.json()
-    local_products = []
-
-    if not os.path.exists(PRODUCTS_FILE):
-        with open(PRODUCTS_FILE, "w") as file:
-            json.dump(local_products, file)
-    else:
-        with open(PRODUCTS_FILE, "r") as file:
-            local_products = json.load(file)
-    products_data = api_products + local_products
-
-
-fetch_initial_data()
+products_data = fetch_initial_data(BASE_URL, PRODUCTS_FILE)
 
 
 # Get all products
