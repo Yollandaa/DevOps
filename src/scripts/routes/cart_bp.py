@@ -1,12 +1,15 @@
 from flask import Blueprint, request, jsonify
 from scripts.data.data import *
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BASE_URL = os.getenv("DATA.RESOURCE.API.CARTS.URL")
+CARTS_FILE = os.getenv("CARTS_FILE")
 
 
 carts_bp = Blueprint("carts_bp", __name__)
-BASE_URL = "https://fakestoreapi.com/carts/"
-CARTS_FILE = "carts.json"
-
 
 carts = fetch_initial_data(BASE_URL, CARTS_FILE)
 
@@ -44,11 +47,6 @@ def add_cart():
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
 
 
-def save_cart(carts):
-    with open(CARTS_FILE, "w") as file:
-        json.dump(carts, file)
-
-
 @carts_bp.route("/<int:id>", methods=["PUT"])
 def update_cart(id):
     try:
@@ -57,7 +55,7 @@ def update_cart(id):
         for index, cart in enumerate(carts):
             if cart["id"] == id:
                 carts[index] = {**cart, **updated_data}
-                save_cart(carts)
+                save_to_file(carts, CARTS_FILE)
                 return jsonify({"message": "Cart updated successfully"}), 200
         return jsonify({"message": "Cart not found"}), 404
     except Exception as e:
@@ -72,7 +70,7 @@ def delete_cart(id):
 
         if len(new_carts) < len(carts):
             carts = new_carts
-            save_cart(carts)
+            save_to_file(carts, CARTS_FILE)
             return jsonify({"message": "Cart deleted successfully"}), 200
         else:
             return jsonify({"message": "Cart not found"}), 404
