@@ -54,9 +54,9 @@ To install FakeAPI, follow these steps:
 
 ## To Run The Project
 ``` sh
-// pip install -r requirements.txt
 // cd to DevOps folder
 // cd src
+// pip install -r requirements.txt
 // run the command
 python main.py
 ```
