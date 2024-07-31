@@ -1,10 +1,13 @@
 import json
 from flask import Blueprint, request, jsonify
 from scripts.data.data import *
+from dotenv import load_dotenv
+
+load_dotenv()
+BASE_URL = os.getenv("DATA.RESOURCE.API.Products.URL")
+PRODUCTS_FILE = os.getenv("PRODUCTS_FILE")
 
 products_bp = Blueprint("products_bp", __name__)
-BASE_URL = "https://fakestoreapi.com/products"
-PRODUCTS_FILE = "products.json"
 
 # Since we can't edit the fakestore api, let's create a local copy of the data
 products_data = fetch_initial_data(BASE_URL, PRODUCTS_FILE)

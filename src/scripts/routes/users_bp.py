@@ -1,28 +1,16 @@
 from flask import Blueprint, request, jsonify
 from scripts.data.data import *
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
+BASE_URL = os.getenv("DATA.RESOURCE.API.USERS.URL")
+USERS_FILE = os.getenv("USERS_FILE")
 
 
 user_bp = Blueprint("user_bp", __name__)
-BASE_URL = "https://fakestoreapi.com/users"
-USERS_FILE = "users.json"
 
 users = fetch_initial_data(BASE_URL, USERS_FILE)
-
-
-def save_users(users):
-    with open(USERS_FILE, "w") as file:
-        json.dump(users, file)
-
-
-def remove_users(user):
-    with open(USERS_FILE, "r") as file:
-        local_users = json.load(file)
-
-    if user in local_users:
-        local_users.remove(user)
-        with open(USERS_FILE, "w") as file:
-            json.dump(local_users, file)
 
 
 @user_bp.route("/", methods=["GET"])
@@ -80,7 +68,7 @@ def update_user(name):
                 break
 
         if user_updated:
-            save_users(users)
+            save_to_file(users, USERS_FILE)
             return jsonify({"message": "User updated successfully"}), 200
         else:
             return jsonify({"message": "User not found"}), 404
@@ -103,7 +91,7 @@ def delete_user(name):
             return jsonify({"message": "User not found"}), 404
 
         users = filtered_users
-        save_users(users)
+        save_to_file(users, USERS_FILE)
         return jsonify({"message": "User deleted successfully"}), 200
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
