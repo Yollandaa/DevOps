@@ -59,3 +59,27 @@ To install FakeAPI, follow these steps:
 // run the command
 python main.py
 ```
+
+## Testing
+You can test the API endpoints using Postman. Here are some example endpoints:
+
+- Products API endpoints: 
+    1. GET and POST products: http://127.0.0.1:5000/api/products
+    2. GET categories: http://127.0.0.1:5000/api/products/categories
+    3. GET specific category: http://127.0.0.1:5000/api/products/category/:category_name
+    4. GET specific product: http://127.0.0.1:5000/api/products/:id
+    5. DELETE specific product: http://127.0.0.1:5000/api/products/:id
+    6. UPDATE specific product: http://127.0.0.1:5000/api/products/:id
+            
+- Users API endpoints: 
+    1. GET and POST users: http://127.0.0.1:5000/api/users
+    2. GET specific user: http://127.0.0.1:5000/api/users/:name
+    3. UPDATE specific user: http://127.0.0.1:5000/api/users/:name
+    4. DELETE specific user: http://127.0.0.1:5000/api/users/:name
+
+
+- Carts API endpoints: 
+    1. GET and POST: http://127.0.0.1:5000/api/carts
+    2. GET specific cart: http://127.0.0.1:5000/api/carts/:id
+    3. UPDATE specific cart: http://127.0.0.1:5000/api/carts/:id
+    4. DELETE specific cart: http://127.0.0.1:5000/api/carts/:id
