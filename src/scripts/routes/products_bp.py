@@ -64,20 +64,12 @@ def delete_product(product_id):
     product = next((prod for prod in products_data if prod["id"] == product_id), None)
     if product:
         products_data.remove(product)
-        remove_product(product)  # Remove product from JSON file if it is there
+        remove_product_in_file(
+            product, PRODUCTS_FILE
+        )  # Remove product from JSON file if it is there
         return jsonify({"message": "Product deleted successfully"}), 200
     else:
         return jsonify({"error": "Product not found"}), 404
-
-
-def remove_product(product):
-    with open(PRODUCTS_FILE, "r") as file:
-        local_products = json.load(file)
-
-    if product in local_products:
-        local_products.remove(product)
-        with open(PRODUCTS_FILE, "w") as file:
-            json.dump(local_products, file)
 
 
 # Edit product using id
@@ -93,25 +85,9 @@ def edit_product(product_id):
         product.update(edit_product)
 
         # Update the local JSON file if data is there
-        if update_product(product):
+        if update_product_in_file(product, PRODUCTS_FILE):
             return jsonify({"message": "Product updated successfully"}), 200
         else:
             return jsonify({"error": "Failed to update JSON file"}), 500
     else:
         return jsonify({"error": "Product not found"}), 404
-
-
-def update_product(updated_product):
-    rtn = False
-    with open(PRODUCTS_FILE, "r") as file:
-        local_products = json.load(file)
-
-    for index, product in enumerate(local_products):
-        if product["id"] == updated_product["id"]:
-            local_products[index] = updated_product
-            break
-
-    with open(PRODUCTS_FILE, "w") as file:
-        json.dump(local_products, file)
-        rtn = True
-    return rtn
