@@ -1,6 +1,13 @@
-import json
+"""
+    @author: Name Surname - E123456
+    Summary: Summary of file
+    Last modufied date: date
+    Last modufied usesr: usesr
+"""
+
 import os
 import requests
+import json
 
 resources_dir = "./resources"
 
