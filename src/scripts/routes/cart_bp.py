@@ -1,17 +1,26 @@
+"""
+    @authors: Caleb Potts - E1005278, Yolanda Dastile - 
+    Summary: Handles CRUD operations for shopping carts,
+    fetching initial data from an API and a local file, 
+    and performing create, read, update, and delete actions 
+    on the carts, while saving changes to the local file. 
+    Last modufied date: 02/08/2024
+    Last modufied usesr: Caleb Potts
+"""
+
 from flask import Blueprint, request, jsonify
 from scripts.data.data import *
-import json
 from dotenv import load_dotenv
 
 load_dotenv()
 
 BASE_URL = os.getenv("DATA.RESOURCE.API.CARTS.URL")
-CARTS_FILE = os.getenv("CARTS_FILE")
+CARTS_FILE = os.getenv("DATA.RESOURCE.CARTS.FILE")
 
 
 carts_bp = Blueprint("carts_bp", __name__)
 
-carts = fetch_initial_data(BASE_URL, CARTS_FILE)
+carts = DataHandler.fetch_initial_data(BASE_URL, CARTS_FILE)
 
 
 @carts_bp.route("/", methods=["GET"])
@@ -41,7 +50,7 @@ def add_cart():
         cart_data["id"] = max_id + 1
         carts.append(cart_data)
 
-        save_to_file(cart_data, CARTS_FILE)
+        DataHandler.save_to_file(cart_data, CARTS_FILE)
         return jsonify({"message": "Cart added successfully"}), 201
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
@@ -55,7 +64,7 @@ def update_cart(id):
         for index, cart in enumerate(carts):
             if cart["id"] == id:
                 carts[index] = {**cart, **updated_data}
-                save_to_file(carts, CARTS_FILE)
+                DataHandler.save_to_file(carts, CARTS_FILE)
                 return jsonify({"message": "Cart updated successfully"}), 200
         return jsonify({"message": "Cart not found"}), 404
     except Exception as e:
@@ -70,7 +79,7 @@ def delete_cart(id):
 
         if len(new_carts) < len(carts):
             carts = new_carts
-            save_to_file(carts, CARTS_FILE)
+            DataHandler.save_to_file(carts, CARTS_FILE)
             return jsonify({"message": "Cart deleted successfully"}), 200
         else:
             return jsonify({"message": "Cart not found"}), 404
