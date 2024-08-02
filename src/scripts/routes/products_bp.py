@@ -1,16 +1,25 @@
-import json
+"""
+    @authors: Caleb Potts - E1005278, Yolanda Dastile - 
+    Summary: Handles CRUD operations for products,
+    fetching initial data from an API and a local file, 
+    and performing create, read, update, and delete actions 
+    on the carts, while saving changes to the local file. 
+    Last modufied date: 02/08/2024
+    Last modufied usesr: Caleb Potts
+"""
+
 from flask import Blueprint, request, jsonify
 from scripts.data.data import *
 from dotenv import load_dotenv
 
 load_dotenv()
 BASE_URL = os.getenv("DATA.RESOURCE.API.Products.URL")
-PRODUCTS_FILE = os.getenv("PRODUCTS_FILE")
+PRODUCTS_FILE = os.getenv("DATA.RESOURCE.PRODUCTS.FILE")
 
 products_bp = Blueprint("products_bp", __name__)
 
 # Since we can't edit the fakestore api, let's create a local copy of the data
-products_data = fetch_initial_data(BASE_URL, PRODUCTS_FILE)
+products_data = DataHandler.fetch_initial_data(BASE_URL, PRODUCTS_FILE)
 
 
 # Get all products
@@ -55,7 +64,7 @@ def post_product():
     products_data.append(new_product)
 
     # Save the new product to the JSON file
-    save_to_file(new_product, PRODUCTS_FILE)
+    DataHandler.save_to_file(new_product, PRODUCTS_FILE)
 
     return jsonify(new_product), 201
 
@@ -67,7 +76,7 @@ def delete_product(product_id):
     product = next((prod for prod in products_data if prod["id"] == product_id), None)
     if product:
         products_data.remove(product)
-        remove_product_in_file(
+        DataHandler.remove_product_in_file(
             product, PRODUCTS_FILE
         )  # Remove product from JSON file if it is there
         return jsonify({"message": "Product deleted successfully"}), 200
@@ -88,7 +97,7 @@ def edit_product(product_id):
         product.update(edit_product)
 
         # Update the local JSON file if data is there
-        if update_product_in_file(product, PRODUCTS_FILE):
+        if DataHandler.update_product_in_file(product, PRODUCTS_FILE):
             return jsonify({"message": "Product updated successfully"}), 200
         else:
             return jsonify({"error": "Failed to update JSON file"}), 500

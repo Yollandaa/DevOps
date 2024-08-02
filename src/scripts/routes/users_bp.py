@@ -1,16 +1,25 @@
+"""
+    @authors: Caleb Potts - E1005278, Yolanda Dastile - 
+    Summary: Handles CRUD operations for users,
+    fetching initial data from an API and a local file, 
+    and performing create, read, update, and delete actions 
+    on the carts, while saving changes to the local file. 
+    Last modufied date: 02/08/2024
+    Last modufied usesr: Caleb Potts
+"""
+
 from flask import Blueprint, request, jsonify
 from scripts.data.data import *
-import json
 from dotenv import load_dotenv
 
 load_dotenv()
 BASE_URL = os.getenv("DATA.RESOURCE.API.USERS.URL")
-USERS_FILE = os.getenv("USERS_FILE")
+USERS_FILE = os.getenv("DATA.RESOURCE.USERS.FILE")
 
 
 user_bp = Blueprint("user_bp", __name__)
 
-users = fetch_initial_data(BASE_URL, USERS_FILE)
+users = DataHandler.fetch_initial_data(BASE_URL, USERS_FILE)
 
 
 @user_bp.route("/", methods=["GET"])
@@ -46,7 +55,7 @@ def add_user():
         user_data["id"] = max_id + 1
         users.append(user_data)
 
-        save_to_file(user_data, USERS_FILE)
+        DataHandler.save_to_file(user_data, USERS_FILE)
         return jsonify({"message": "User added successfully"}), 201
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
@@ -68,7 +77,7 @@ def update_user(name):
                 break
 
         if user_updated:
-            save_to_file(users, USERS_FILE)
+            DataHandler.save_to_file(users, USERS_FILE)
             return jsonify({"message": "User updated successfully"}), 200
         else:
             return jsonify({"message": "User not found"}), 404
@@ -91,7 +100,7 @@ def delete_user(name):
             return jsonify({"message": "User not found"}), 404
 
         users = filtered_users
-        save_to_file(users, USERS_FILE)
+        DataHandler.save_to_file(users, USERS_FILE)
         return jsonify({"message": "User deleted successfully"}), 200
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
