@@ -61,7 +61,7 @@ To install FakeAPI, follow these steps:
 python main.py
 ```
 
-## Testing
+## Route Testing
 You can test the API endpoints using Postman. Here are some example endpoints:
 
 - Products API endpoints: 
