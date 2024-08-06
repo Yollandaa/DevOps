@@ -8,31 +8,29 @@
     Last modufied usesr: Caleb Potts
 """
 
-import os
 from flask import Blueprint, request, jsonify
 from scripts.data.data import DataHandler
-from dotenv import load_dotenv
-
-load_dotenv()
-BASE_URL = os.getenv("DATA.RESOURCE.API.Products.URL")
-PRODUCTS_FILE = os.getenv("DATA.RESOURCE.PRODUCTS.FILE")
 
 products_bp = Blueprint("products_bp", __name__)
-
-# Since we can't edit the fakestore api, let's create a local copy of the data
-products_data = DataHandler.fetch_initial_data(BASE_URL, PRODUCTS_FILE)
 
 
 # Get all products
 @products_bp.route("/", methods=["GET"])
 def get_products():
-    return jsonify(products_data), 200
+    return jsonify(DataHandler.all_products_api_call), 200
 
 
 # Get product with id
 @products_bp.route("/<int:product_id>", methods=["GET"])
 def get_product_by_id(product_id):
-    product = next((prod for prod in products_data if prod["id"] == product_id), None)
+    product = next(
+        (
+            prod
+            for prod in DataHandler.all_products_api_call
+            if prod["id"] == product_id
+        ),
+        None,
+    )
     if product:
         return jsonify(product), 200
     else:
@@ -42,7 +40,7 @@ def get_product_by_id(product_id):
 # Gat all categories
 @products_bp.route("/categories", methods=["GET"])
 def get_categories():
-    categories = {product["category"] for product in products_data}
+    categories = {product["category"] for product in DataHandler.all_products_api_call}
     return jsonify({"categories": list(categories)}), 200
 
 
@@ -50,7 +48,9 @@ def get_categories():
 @products_bp.route("/category/<string:category_name>", methods=["GET"])
 def get_products_in_category(category_name):
     category_products = [
-        prod for prod in products_data if prod["category"] == category_name
+        prod
+        for prod in DataHandler.all_products_api_call
+        if prod["category"] == category_name
     ]
     return jsonify(category_products), 200
 
@@ -60,12 +60,11 @@ def get_products_in_category(category_name):
 def post_product():
     new_product = request.json
     new_product["id"] = (
-        max([prod["id"] for prod in products_data]) + 1 if products_data else 1
+        max([prod["id"] for prod in DataHandler.all_products_api_call]) + 1
+        if DataHandler.all_products_api_call
+        else 1
     )
-    products_data.append(new_product)
-
-    # Save the new product to the JSON file
-    DataHandler.save_to_file(new_product, PRODUCTS_FILE)
+    DataHandler.all_products_api_call.append(new_product)
 
     return jsonify(new_product), 201
 
@@ -73,13 +72,16 @@ def post_product():
 # Delete a product using id
 @products_bp.route("/<int:product_id>", methods=["DELETE"])
 def delete_product(product_id):
-    global products_data
-    product = next((prod for prod in products_data if prod["id"] == product_id), None)
+    product = next(
+        (
+            prod
+            for prod in DataHandler.all_products_api_call
+            if prod["id"] == product_id
+        ),
+        None,
+    )
     if product:
-        products_data.remove(product)
-        DataHandler.remove_product_in_file(
-            product, PRODUCTS_FILE
-        )  # Remove product from JSON file if it is there
+        DataHandler.all_products_api_call.remove(product)
         return jsonify({"message": "Product deleted successfully"}), 200
     else:
         return jsonify({"error": "Product not found"}), 404
@@ -88,19 +90,18 @@ def delete_product(product_id):
 # Edit product using id
 @products_bp.route("/<int:product_id>", methods=["PUT"])
 def edit_product(product_id):
-    global products_data
     edit_product = request.json
-
-    product = next((prod for prod in products_data if prod["id"] == product_id), None)
-
+    product = next(
+        (
+            prod
+            for prod in DataHandler.all_products_api_call
+            if prod["id"] == product_id
+        ),
+        None,
+    )
     if product:
         # Update the product with the new data
         product.update(edit_product)
-
-        # Update the local JSON file if data is there
-        if DataHandler.update_product_in_file(product, PRODUCTS_FILE):
-            return jsonify({"message": "Product updated successfully"}), 200
-        else:
-            return jsonify({"error": "Failed to update JSON file"}), 500
+        return jsonify({"message": "Product updated successfully"}), 200
     else:
         return jsonify({"error": "Product not found"}), 404
