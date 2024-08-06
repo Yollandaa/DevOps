@@ -6,6 +6,7 @@ from app import create_app
 app = create_app()
 
 if __name__ == "__main__":
+    load_dotenv()
     BASE_URL_USERS = os.getenv("DATA.RESOURCE.API.USERS.URL")
     BASE_URL_CARTS = os.getenv("DATA.RESOURCE.API.CARTS.URL")
     BASE_URL_PRODUCTS = os.getenv("DATA.RESOURCE.API.PRODUCTS.URL")

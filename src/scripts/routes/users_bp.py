@@ -8,24 +8,15 @@
     Last modufied usesr: Caleb Potts
 """
 
-import os
 from flask import Blueprint, request, jsonify
 from scripts.data.data import DataHandler
-from dotenv import load_dotenv
-
-load_dotenv()
-BASE_URL = os.getenv("DATA.RESOURCE.API.USERS.URL")
-USERS_FILE = os.getenv("DATA.RESOURCE.USERS.FILE")
-
 
 user_bp = Blueprint("user_bp", __name__)
-
-users = DataHandler.fetch_initial_data(BASE_URL, USERS_FILE)
 
 
 @user_bp.route("/", methods=["GET"])
 def get_users():
-    return jsonify(users), 200
+    return jsonify(DataHandler.all_users_api_call), 200
 
 
 @user_bp.route("/<string:name>", methods=["GET"])
