@@ -8,8 +8,9 @@
     Last modufied usesr: Caleb Potts
 """
 
+import os
 from flask import Blueprint, request, jsonify
-from scripts.data.data import *
+from scripts.data.data import DataHandler
 from dotenv import load_dotenv
 
 load_dotenv()

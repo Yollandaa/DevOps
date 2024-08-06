@@ -12,4 +12,6 @@ def create_app():
     app.register_blueprint(carts_bp, url_prefix="/api/carts")
     app.register_blueprint(products_bp, url_prefix="/api/products")
 
+    # app.register_blueprint(products_bp, url_prefix="rest/api/1/products")
+
     return app
