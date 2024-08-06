@@ -15,6 +15,7 @@ import json
 
 class DataHandler:
     resources_dir = "./resources"
+    # all_products_api_call = None
 
     @classmethod
     def fetch_initial_data(cls, url, filename):
@@ -28,8 +29,12 @@ class DataHandler:
         Returns:
             List[Dict[str, Any]]: The combined list of API and local data.
         """
+
+        print("Fetch initial data started")
+
         response = requests.get(url, verify=False)
         api_data = response.json()
+        # cls.all_products_api_call = response.json()
         local_data = []
 
         if not os.path.exists(cls.resources_dir):
@@ -44,6 +49,7 @@ class DataHandler:
             with open(filepath, "r") as file:
                 local_data = json.load(file)
         all_data = api_data + local_data
+        print("Fetch initial data finished")
         return all_data
 
     @classmethod

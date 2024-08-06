@@ -8,8 +8,9 @@
     Last modufied usesr: Caleb Potts
 """
 
+import os
 from flask import Blueprint, request, jsonify
-from scripts.data.data import *
+from scripts.data.data import DataHandler
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -30,12 +31,15 @@ def get_users():
 @user_bp.route("/<string:name>", methods=["GET"])
 def get_user_by_name(name):
 
-    filtered_users = [
-        user
-        for user in users
-        if user["name"]["firstname"].lower() == name.lower()
-        or user["name"]["lastname"].lower() == name.lower()
-    ]
+    filtered_users = next(
+        (
+            user
+            for user in users
+            if user["name"]["firstname"].lower() == name.lower()
+            or user["name"]["lastname"].lower() == name.lower()
+        ),
+        None,
+    )
     if filtered_users:
         return jsonify(filtered_users), 200
     else:
