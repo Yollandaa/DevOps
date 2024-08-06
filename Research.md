@@ -15,36 +15,37 @@
 
 
 ## On-Premises Deployment Architecture
-
+- Where is this load-balancer living on : internet gateways/firewalls/
+- VPC -> Virtual Private Cloud
 
 ```plaintext
-+-----------------------+          +--------------------------=+
-|                       |          |                           |
-|  On-Premises Data     |          |   On-Premises Data        |
-|     Center            |          |      Center               |
-|                       |          |                           |
-|  +-----------------+  |          |    +-----------------+    |
-|  | Load Balancer   |  |          |    | Load Balancer   |    |
-|  +--------+--------+  |          |    +--------+--------+    |
-|           |           |          |             |             |
-|           |           |          |             |             |
-|  +--------v--------+  |          |    +---------v---------+  |
-|  |  Flask App      |  |          |    |   Flask App       |  |
-|  |  (Dockerized)   |  |          |    |   (Dockerized)    |  |
-|  +--------+--------+  |          |    +---------+---------+  |
-|           |           |          |             |             |
-|           |           |          |             |             |
-|  +--------v--------+  |          |    +---------v---------+  |
-|  |  Local Storage   | |          |    |  Local Storage     | |
-|  |  (JSON Files)    | |          |    |  (JSON Files)      | |
-|  +--------+--------+  |          |    +---------+---------+  |
-|           |           |          |             |             |
-|           |           |          |             |             |
-|  +--------v--------+  |          |    +---------v---------+  |
-|  | External API    |  |          |    | External API      |  |
-|  +-----------------+  |          |    +-------------------+  |
-|                       |          |                           |
-+-----------------------+          +---------------------------+
++-----------------------+          +--------------------------+
+|                       |          |                          |
+|  On-Premises Data     |          |   On-Premises Data       |
+|     Center            |          |      Center              |
+|                       |          |                          |
+|  +-----------------+  |          |    +-----------------+   |
+|  | Load Balancer   |  |          |    | Load Balancer   |   |
+|  +--------+--------+  |          |    +--------+--------+   |
+|           |            |          |             |           |
+|           |            |          |             |           |
+|  +--------v--------+  |          |    +---------v---------+ |
+|  |  Flask App      |  |          |    |   Flask App       | |
+|  |  (Dockerized)   |  |          |    |   (Dockerized)    | |
+|  +--------+--------+  |          |    +---------+---------+ |
+|           |            |          |             |           |
+|           |            |          |             |           |
+|  +--------v--------+  |          |    +---------v---------+ |
+|  |  Local Storage   |  |          |    |  Local Storage     | |
+|  |  (JSON Files)    |  |          |    |  (JSON Files)      | |
+|  +--------+--------+  |          |    +---------+---------+ |
+|           |            |          |             |           |
+|           |            |          |             |           |
+|  +--------v--------+  |          |    +---------v---------+ |
+|  | External API    |  |          |    | External API      | |
+|  +-----------------+  |          |    +-------------------+ |
+|                       |          |                          |
++-----------------------+          +--------------------------+
 ```
 - **Load Balancer**: Manages traffic to the Flask app instances.
 - **Flask App (Dockerized)**: The application containerized for consistent deployment.

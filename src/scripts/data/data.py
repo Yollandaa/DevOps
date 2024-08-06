@@ -13,44 +13,74 @@ import requests
 import json
 
 
+# class DataHandler:
+#     resources_dir = "./resources"
+#     # all_products_api_call = None
+
+#     @classmethod
+#     def fetch_initial_data(cls, url, filename):
+#         """
+#         Fetch initial data from an API and combine it with local data.
+
+#         Args:
+#             url (str): The URL to fetch data from.
+#             filename (str): The name of the file to save the combined data.
+
+#         Returns:
+#             List[Dict[str, Any]]: The combined list of API and local data.
+#         """
+
+#         print("Fetch initial data started")
+
+#         response = requests.get(url, verify=False)
+#         api_data = response.json()
+#         # cls.all_products_api_call = response.json()
+#         local_data = []
+
+#         if not os.path.exists(cls.resources_dir):
+#             os.makedirs(cls.resources_dir)
+
+#         filepath = os.path.join(cls.resources_dir, filename)
+
+#         if not os.path.exists(filepath):
+#             with open(filepath, "w") as file:
+#                 json.dump(local_data, file)
+#         else:
+#             with open(filepath, "r") as file:
+#                 local_data = json.load(file)
+#         all_data = api_data + local_data
+#         print("Fetch initial data finished")
+#         return all_data
+
+
 class DataHandler:
-    resources_dir = "./resources"
-    # all_products_api_call = None
+    all_users_api_call = None
+    all_carts_api_call = None
+    all_products_api_call = None
 
     @classmethod
-    def fetch_initial_data(cls, url, filename):
+    def fetch_initial_data(cls, url, data_type):
         """
-        Fetch initial data from an API and combine it with local data.
+        Fetch initial data from an API and store it in the corresponding class variable.
 
         Args:
             url (str): The URL to fetch data from.
-            filename (str): The name of the file to save the combined data.
-
-        Returns:
-            List[Dict[str, Any]]: The combined list of API and local data.
+            data_type (str): An identifier for the type of data being fetched.
         """
-
-        print("Fetch initial data started")
+        print(f"Fetch {data_type} data started")
 
         response = requests.get(url, verify=False)
         api_data = response.json()
-        # cls.all_products_api_call = response.json()
-        local_data = []
 
-        if not os.path.exists(cls.resources_dir):
-            os.makedirs(cls.resources_dir)
+        # Store fetched data in the corresponding class variable based on data_type
+        if data_type == "users":
+            cls.all_users_api_call = api_data
+        elif data_type == "carts":
+            cls.all_carts_api_call = api_data
+        elif data_type == "products":
+            cls.all_products_api_call = api_data
 
-        filepath = os.path.join(cls.resources_dir, filename)
-
-        if not os.path.exists(filepath):
-            with open(filepath, "w") as file:
-                json.dump(local_data, file)
-        else:
-            with open(filepath, "r") as file:
-                local_data = json.load(file)
-        all_data = api_data + local_data
-        print("Fetch initial data finished")
-        return all_data
+        print(f"Fetch {data_type} data finished")
 
     @classmethod
     def save_to_file(cls, item, filename):
