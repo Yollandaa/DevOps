@@ -8,24 +8,15 @@
     Last modufied usesr: Caleb Potts
 """
 
-import os
 from flask import Blueprint, request, jsonify
 from scripts.data.data import DataHandler
-from dotenv import load_dotenv
-
-load_dotenv()
-BASE_URL = os.getenv("DATA.RESOURCE.API.USERS.URL")
-USERS_FILE = os.getenv("DATA.RESOURCE.USERS.FILE")
-
 
 user_bp = Blueprint("user_bp", __name__)
-
-users = DataHandler.fetch_initial_data(BASE_URL, USERS_FILE)
 
 
 @user_bp.route("/", methods=["GET"])
 def get_users():
-    return jsonify(users), 200
+    return jsonify(DataHandler.all_users_api_call), 200
 
 
 @user_bp.route("/<string:name>", methods=["GET"])
@@ -34,7 +25,7 @@ def get_user_by_name(name):
     filtered_users = next(
         (
             user
-            for user in users
+            for user in DataHandler.all_users_api_call
             if user["name"]["firstname"].lower() == name.lower()
             or user["name"]["lastname"].lower() == name.lower()
         ),
@@ -51,15 +42,15 @@ def add_user():
     try:
         user_data = request.get_json()
 
-        if users:
-            max_id = max(user["id"] for user in users if "id" in user)
+        if DataHandler.all_users_api_call:
+            max_id = max(
+                user["id"] for user in DataHandler.all_users_api_call if "id" in user
+            )
         else:
             max_id = 0
 
         user_data["id"] = max_id + 1
-        users.append(user_data)
-
-        DataHandler.save_to_file(user_data, USERS_FILE)
+        DataHandler.all_users_api_call.append(user_data)
         return jsonify({"message": "User added successfully"}), 201
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
@@ -69,9 +60,8 @@ def add_user():
 def update_user(name):
     try:
         user_data = request.get_json()
-        global users
         user_updated = False
-        for user in users:
+        for user in DataHandler.all_users_api_call:
             if (
                 user["name"]["firstname"].lower() == name.lower()
                 or user["name"]["lastname"].lower() == name.lower()
@@ -81,7 +71,6 @@ def update_user(name):
                 break
 
         if user_updated:
-            DataHandler.save_to_file(users, USERS_FILE)
             return jsonify({"message": "User updated successfully"}), 200
         else:
             return jsonify({"message": "User not found"}), 404
@@ -92,19 +81,17 @@ def update_user(name):
 @user_bp.route("/<string:name>", methods=["DELETE"])
 def delete_user(name):
     try:
-        global users
         filtered_users = [
             user
-            for user in users
+            for user in DataHandler.all_users_api_call
             if user["name"]["firstname"].lower() != name.lower()
             and user["name"]["lastname"].lower() != name.lower()
         ]
 
-        if len(filtered_users) == len(users):
+        if len(filtered_users) == len(DataHandler.all_users_api_call):
             return jsonify({"message": "User not found"}), 404
 
-        users = filtered_users
-        DataHandler.save_to_file(users, USERS_FILE)
+        DataHandler.all_users_api_call = filtered_users
         return jsonify({"message": "User deleted successfully"}), 200
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
