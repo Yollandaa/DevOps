@@ -15,13 +15,13 @@ carts_bp = Blueprint("carts_bp", __name__)
 
 
 # Get all carts
-@carts_bp.route("/", methods=["GET"])
+@carts_bp.route("/v1/carts", methods=["GET"])
 def get_carts():
     return jsonify(DataHandler.all_carts_api_call), 200
 
 
 # Get cart by id
-@carts_bp.route("/<int:cart_id>", methods=["GET"])
+@carts_bp.route("/v1/carts/<int:cart_id>", methods=["GET"])
 def get_cart_by_id(cart_id):
     # Filter carts_data to find the cart with the matching id
     cart = next(
@@ -34,7 +34,7 @@ def get_cart_by_id(cart_id):
 
 
 # Post new Cart
-@carts_bp.route("/", methods=["POST"])
+@carts_bp.route("/v1/carts", methods=["POST"])
 def post_cart():
     new_cart = request.json
     # Generate a new ID for the cart
@@ -49,7 +49,7 @@ def post_cart():
 
 
 # Delete a Cart using ID
-@carts_bp.route("/<int:cart_id>", methods=["DELETE"])
+@carts_bp.route("/v1/carts/<int:cart_id>", methods=["DELETE"])
 def delete_cart(cart_id):
     cart = next(
         (cart for cart in DataHandler.all_carts_api_call if cart["id"] == cart_id), None
@@ -62,7 +62,7 @@ def delete_cart(cart_id):
 
 
 # Edit Cart using ID
-@carts_bp.route("/<int:cart_id>", methods=["PUT"])
+@carts_bp.route("/v1/carts/<int:cart_id>", methods=["PUT"])
 def edit_cart(cart_id):
     edit_cart_data = request.json
     cart = next(
