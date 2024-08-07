@@ -14,12 +14,12 @@ from scripts.data.data import DataHandler
 user_bp = Blueprint("user_bp", __name__)
 
 
-@user_bp.route("/", methods=["GET"])
+@user_bp.route("/v1/users", methods=["GET"])
 def get_users():
     return jsonify(DataHandler.all_users_api_call), 200
 
 
-@user_bp.route("/<string:name>", methods=["GET"])
+@user_bp.route("/v1/users/<string:name>", methods=["GET"])
 def get_user_by_name(name):
 
     filtered_users = next(
@@ -37,7 +37,7 @@ def get_user_by_name(name):
         return jsonify({"message": "User not found"}), 404
 
 
-@user_bp.route("/", methods=["POST"])
+@user_bp.route("/v1/users", methods=["POST"])
 def add_user():
     try:
         user_data = request.get_json()
@@ -56,7 +56,7 @@ def add_user():
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
 
 
-@user_bp.route("/<string:name>", methods=["PUT"])
+@user_bp.route("/v1/users/<string:name>", methods=["PUT"])
 def update_user(name):
     try:
         user_data = request.get_json()
@@ -78,7 +78,7 @@ def update_user(name):
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
 
 
-@user_bp.route("/<string:name>", methods=["DELETE"])
+@user_bp.route("/v1/users/<string:name>", methods=["DELETE"])
 def delete_user(name):
     try:
         filtered_users = [
